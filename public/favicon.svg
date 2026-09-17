@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <rect width="100" height="100" rx="24" fill="#0B1120"/>
+  <rect x="2" y="2" width="96" height="96" rx="22" stroke="url(#paint0_linear)" stroke-width="3"/>
+  <path d="M30 28H70C72.2 28 74 29.8 74 32V68C74 70.2 72.2 72 70 72H30C27.8 72 26 70.2 26 68V32C26 29.8 27.8 28 30 28Z" stroke="#38BDF8" stroke-width="2.5" stroke-dasharray="4 2"/>
+  <polygon points="42,38 66,50 42,62" fill="url(#paint1_linear)"/>
+  <circle cx="68" cy="32" r="3" fill="#FB7185"/>
+  <circle cx="32" cy="68" r="3" fill="#38BDF8"/>
+  <defs>
+    <linearGradient id="paint0_linear" x1="0" y1="0" x2="100" y2="100" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#38BDF8"/>
+      <stop offset="0.5" stop-color="#818CF8"/>
+      <stop offset="1" stop-color="#FB7185"/>
+    </linearGradient>
+    <linearGradient id="paint1_linear" x1="42" y1="38" x2="66" y2="62" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#38BDF8"/>
+      <stop offset="1" stop-color="#7DD3FC"/>
+    </linearGradient>
+  </defs>
+</svg>

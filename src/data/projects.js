@@ -1,0 +1,107 @@
+export const PROJECTS = [
+  {
+    id: "edit-1",
+    title: "GENUINE MEMORIES // Oregairu AMV",
+    japaneseTitle: "やはり俺の青春 // 本物",
+    category: "amv",
+    categoryLabel: "Anime AMV",
+    aspectRatio: "16:9",
+    duration: "1:42",
+    tools: ["After Effects", "Premiere Pro"],
+    primaryCharacter: "yukino",
+    description: "Intense emotional pacing featuring Yukino & Hachiman. Custom 3D camera projection, flow transitions, seamless beat matching, and subtle chromatic aberration.",
+    techniques: ["3D Camera Tracking", "Velocity Remapping", "Custom Color LUTs", "Sound Design"],
+    thumbnail: "https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=1200&q=80",
+    // Direct playable video URL that works 100% inline in browser without external tabs
+    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+    featured: true
+  },
+  {
+    id: "edit-2",
+    title: "NEON VELOCITY // Fast Paced Reel",
+    japaneseTitle: "音速のリズム // ショーツ",
+    category: "reels",
+    categoryLabel: "Shorts & Reels",
+    aspectRatio: "9:16",
+    duration: "0:38",
+    tools: ["CapCut PC", "After Effects"],
+    primaryCharacter: "iroha",
+    description: "High retention 9:16 vertical edit built for TikTok/Reels algorithms. Kinetic typography, speed ramp impacts, whip pans, and punchy audio transients.",
+    techniques: ["Kinetic Typography", "Whip Pans", "High-Retention Hooks", "Audio Impact Stems"],
+    thumbnail: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=800&q=80",
+    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+    featured: true
+  },
+  {
+    id: "edit-3",
+    title: "SAKURA BLOOM // Aesthetic Storytelling",
+    japaneseTitle: "桜の季節 // シネマティック",
+    category: "amv",
+    categoryLabel: "Anime AMV",
+    aspectRatio: "16:9",
+    duration: "2:15",
+    tools: ["Premiere Pro", "After Effects"],
+    primaryCharacter: "yui",
+    description: "Warm, emotional narrative flow inspired by Yui Yuigahama's gentle warmth. Multi-layered ambient audio design, film grain textures, and soft glow grading.",
+    techniques: ["Film Halation", "Color Separation", "Ambient Foley", "L-Cut Pacing"],
+    thumbnail: "https://images.unsplash.com/photo-1522383225653-ed111181a951?auto=format&fit=crop&w=1200&q=80",
+    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+    featured: false
+  },
+  {
+    id: "edit-4",
+    title: "CYBERPUNK GLITCH // Motion Graphics Showcase",
+    japaneseTitle: "サイバー空間 // VFXエフェクト",
+    category: "motion",
+    categoryLabel: "Motion Graphics",
+    aspectRatio: "16:9",
+    duration: "1:10",
+    tools: ["After Effects"],
+    primaryCharacter: "yukino",
+    description: "Complex HUD elements, CRT scanlines, pixel displacement, optical flares, and geometric particle animations synchronized to synthwave basslines.",
+    techniques: ["HUD Design", "Pixel Sorting", "Optical Flares", "Expression Scripting"],
+    thumbnail: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1200&q=80",
+    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerEscapes.mp4",
+    featured: false
+  },
+  {
+    id: "edit-5",
+    title: "VIRAL HOOK // Gaming Montage Reel",
+    japaneseTitle: "ゲームハイライト // 瞬間",
+    category: "reels",
+    categoryLabel: "Shorts & Reels",
+    aspectRatio: "9:16",
+    duration: "0:45",
+    tools: ["CapCut PC", "Premiere Pro"],
+    primaryCharacter: "iroha",
+    description: "Ultra-crisp frame blending, dynamic subtitles with emoji emphasis, motion tracked callouts, and bass drops optimized for mobile viewing.",
+    techniques: ["Auto-Captions Styling", "Frame Blending", "Screen Shakes", "SFX Stems"],
+    thumbnail: "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=800&q=80",
+    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerJoyBlazes.mp4",
+    featured: true
+  },
+  {
+    id: "edit-6",
+    title: "THE SERVICE CLUB ARCHIVE // Mini Documentary Edit",
+    japaneseTitle: "奉仕部記録 // ドキュメンタリー",
+    category: "commercial",
+    categoryLabel: "Commercial / YouTube",
+    aspectRatio: "16:9",
+    duration: "3:40",
+    tools: ["Premiere Pro"],
+    primaryCharacter: "hachiman",
+    description: "Pacing study in storytelling and dialogue tension. Dialogue cleanup with parametric EQ, subtle music ducking, and documentary B-roll transitions.",
+    techniques: ["Multi-Track Audio Ducking", "Color Matching", "J-Cut Transitions", "Lower Thirds"],
+    thumbnail: "https://images.unsplash.com/photo-1536240478700-b869070f9279?auto=format&fit=crop&w=1200&q=80",
+    videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+    featured: false
+  }
+];
+
+export const CATEGORIES = [
+  { id: "all", label: "All Works", count: 6 },
+  { id: "amv", label: "Anime AMVs", count: 2 },
+  { id: "reels", label: "9:16 Reels / Shorts", count: 2 },
+  { id: "motion", label: "Motion Graphics / VFX", count: 1 },
+  { id: "commercial", label: "Long-Form & Commercial", count: 1 }
+];
