@@ -70,13 +70,19 @@ export default function App() {
   };
 
   return (
-    <div 
-      className="min-h-screen relative text-[#EBEBEB] selection:bg-[#FF6B50] selection:text-white bg-[#050505] bg-fixed bg-cover bg-top"
-      style={{
-        backgroundImage: `linear-gradient(rgba(5, 5, 5, 0.80), rgba(5, 5, 5, 0.90)), url('${import.meta.env.BASE_URL}images/oregairu_bg.jpg')`
-      }}
-    >
+    <div className="min-h-screen relative text-[#EBEBEB] selection:bg-[#FF6B50] selection:text-white bg-[#050505]">
       
+      {/* Visibly Crisp & Responsive Fixed Background for Mobile & Desktop */}
+      <div className="fixed inset-0 -z-10 pointer-events-none overflow-hidden">
+        <img 
+          src={`${import.meta.env.BASE_URL}images/oregairu_bg.jpg`}
+          alt="Portfolio Background"
+          className="w-full h-full object-cover object-[center_top] md:object-center opacity-45 sm:opacity-35 scale-105 transition-opacity duration-700"
+        />
+        {/* Subtle cinematic gradient overlay preserving artwork visibility */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#050505]/50 via-[#050505]/70 to-[#050505]/95" />
+      </div>
+
       {/* Fixed Top Navigation */}
       <Navbar onCopyDiscord={handleCopyDiscord} />
 

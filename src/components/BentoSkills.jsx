@@ -15,10 +15,10 @@ export default function BentoSkills() {
             </span>
 
             <div className="space-y-1">
-              <h2 className="text-6xl md:text-8xl font-black tracking-tightest text-[#EBEBEB] leading-none">
+              <h2 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tightest text-[#EBEBEB] leading-tight">
                 EXPERIENCED.
               </h2>
-              <p className="text-xl md:text-2xl text-[#888888] tracking-tight font-medium">
+              <p className="text-lg md:text-xl text-[#888888] tracking-tight font-medium">
                 Frame-accurate video editing.
               </p>
             </div>

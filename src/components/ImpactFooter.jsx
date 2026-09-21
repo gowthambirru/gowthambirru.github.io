@@ -14,12 +14,12 @@ export default function ImpactFooter({
   return (
     <footer id="contact" className="pt-24 pb-32 px-6 max-w-7xl mx-auto border-t border-[#222222]">
       
-      {/* Massive 14vw Typographic Headline */}
-      <div className="select-none mb-16">
+      {/* Editorial Headline */}
+      <div className="select-none mb-10">
         <p className="text-xs font-mono text-[#888888] tracking-widest uppercase mb-4">
           // INQUIRIES & COMMISSIONS
         </p>
-        <h2 className="text-[14vw] font-black tracking-tightest leading-hero text-[#EBEBEB] uppercase">
+        <h2 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tightest leading-tight text-[#EBEBEB] uppercase">
           CRAFT MORE.
         </h2>
       </div>
