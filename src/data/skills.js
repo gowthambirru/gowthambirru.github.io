@@ -1,17 +1,15 @@
 export const SKILLS_EXPERIENCE = {
-  years: 5,
-  title: "5 Years of Dedicated Video Editing",
-  tagline: "Bridging cinematic anime aesthetics with high-retention algorithmic pacing.",
+  title: "Experienced Freelance Video Editor",
+  tagline: "Bridging cinematic aesthetics with high-retention narrative pacing.",
   stats: [
-    { label: "Years Experience", value: "5+", subtext: "Since 2019" },
-    { label: "Completed Projects", value: "250+", subtext: "AMVs, Reels, Promos" },
-    { label: "Cumulative Views", value: "15M+", subtext: "Across YouTube & Reels" },
+    { label: "Status", value: "Active", subtext: "Freelance & Remote" },
+    { label: "Completed Projects", value: "250+", subtext: "Commercial, Docs, Shorts" },
+    { label: "Cumulative Views", value: "15M+", subtext: "Across YouTube & Socials" },
     { label: "Client Rating", value: "4.9/5", subtext: "Collaborative & punctual" }
   ],
   tools: [
     {
       name: "Adobe After Effects",
-      years: "5 Years",
       role: "Motion Design & Advanced VFX",
       icon: "Layers",
       color: "from-blue-500 to-indigo-600",
@@ -30,7 +28,6 @@ export const SKILLS_EXPERIENCE = {
     },
     {
       name: "Adobe Premiere Pro",
-      years: "5 Years",
       role: "Narrative, Pacing & Long-Form",
       icon: "Film",
       color: "from-purple-500 to-pink-600",
@@ -49,7 +46,6 @@ export const SKILLS_EXPERIENCE = {
     },
     {
       name: "CapCut PC",
-      years: "3+ Years",
       role: "Viral Short-Form & High Retention",
       icon: "Smartphone",
       color: "from-cyan-400 to-teal-500",

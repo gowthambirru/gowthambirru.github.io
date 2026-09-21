@@ -63,7 +63,7 @@ export default function ImpactFooter({
           </div>
 
           <p className="text-xs text-[#666666] pt-2">
-            5 Years Experience • After Effects, Premiere Pro, CapCut PC • Inspired by Oregairu.
+            Experienced Freelance Video Editor • After Effects, Premiere Pro, CapCut PC.
           </p>
         </div>
 
@@ -113,7 +113,7 @@ export default function ImpactFooter({
       {/* Copyright */}
       <div className="pt-12 text-xs font-mono text-[#555555] flex flex-col sm:flex-row items-center justify-between gap-4">
         <span>© {new Date().getFullYear()} GOWTHAM. ALL RIGHTS RESERVED.</span>
-        <span>OREGAIRU EDITORIAL EDITION • 「本物が欲しい」</span>
+        <span>PORTFOLIO EDITORIAL EDITION • 「本物が欲しい」</span>
       </div>
 
     </footer>

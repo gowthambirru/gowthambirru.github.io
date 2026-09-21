@@ -16,7 +16,7 @@ export default function BentoSkills() {
 
             <div className="space-y-1">
               <h2 className="text-6xl md:text-8xl font-black tracking-tightest text-[#EBEBEB] leading-none">
-                5 YEARS.
+                EXPERIENCED.
               </h2>
               <p className="text-xl md:text-2xl text-[#888888] tracking-tight font-medium">
                 Frame-accurate video editing.
@@ -24,13 +24,13 @@ export default function BentoSkills() {
             </div>
 
             <p className="text-sm text-[#888888] leading-relaxed">
-              Half a decade devoted to the craft. Balancing aggressive velocity curves with cinematic narrative breathing room.
+              Devoted to the craft of video editing. Balancing aggressive velocity curves with cinematic narrative breathing room.
             </p>
           </div>
 
           <div className="text-xs font-mono text-[#888888] text-left md:text-right space-y-1">
-            <p className="text-white font-bold">ACTIVE TIMELINE</p>
-            <p>2019 — PRESENT</p>
+            <p className="text-white font-bold">FREELANCE STATUS</p>
+            <p>COMMISSIONS OPEN</p>
             <p className="text-[#FF6B50]">WORLDWIDE REMOTE</p>
           </div>
         </div>
@@ -43,7 +43,7 @@ export default function BentoSkills() {
             <h3 className="text-lg font-bold text-[#EBEBEB] tracking-tight">
               Adobe After Effects
             </h3>
-            <p className="text-xs font-mono text-[#888888]">5 Years Experience</p>
+            <p className="text-xs font-mono text-[#888888]">Advanced VFX & Motion</p>
             <p className="text-xs text-[#888888] leading-relaxed pt-2 border-t border-[#1A1A1A]">
               3D camera tracking, velocity curve remapping, kinetic typography, rotoscoping, and custom VFX.
             </p>
@@ -54,7 +54,7 @@ export default function BentoSkills() {
             <h3 className="text-lg font-bold text-[#EBEBEB] tracking-tight">
               Adobe Premiere Pro
             </h3>
-            <p className="text-xs font-mono text-[#888888]">5 Years Experience</p>
+            <p className="text-xs font-mono text-[#888888]">Narrative & Long-Form NLE</p>
             <p className="text-xs text-[#888888] leading-relaxed pt-2 border-t border-[#1A1A1A]">
               Multi-cam narrative flow, multi-track foley & dialogue EQ, J/L-cut transitions, and Lumetri color grading.
             </p>
@@ -65,7 +65,7 @@ export default function BentoSkills() {
             <h3 className="text-lg font-bold text-[#EBEBEB] tracking-tight">
               CapCut PC
             </h3>
-            <p className="text-xs font-mono text-[#888888]">3+ Years Experience</p>
+            <p className="text-xs font-mono text-[#888888]">High-Retention Short-Form</p>
             <p className="text-xs text-[#888888] leading-relaxed pt-2 border-t border-[#1A1A1A]">
               High-retention 9:16 vertical reels, 3-second visual hooks, dynamic animated captions, and rapid turnaround.
             </p>

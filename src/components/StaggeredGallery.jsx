@@ -4,6 +4,7 @@ import { PROJECTS, CATEGORIES } from '../data/projects';
 
 function StaggeredProjectCard({ project, onOpenModal }) {
   const [isPlayingInline, setIsPlayingInline] = useState(false);
+  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const [secondsRemaining, setSecondsRemaining] = useState(60);
   const [isLocked, setIsLocked] = useState(false);
 
@@ -11,7 +12,7 @@ function StaggeredProjectCard({ project, onOpenModal }) {
 
   useEffect(() => {
     let interval;
-    if (isPlayingInline && project.isLongForm && !isLocked) {
+    if (isPlayingInline && isVideoLoaded && project.isLongForm && !isLocked) {
       interval = setInterval(() => {
         setSecondsRemaining((prev) => {
           if (prev <= 1) {
@@ -26,11 +27,12 @@ function StaggeredProjectCard({ project, onOpenModal }) {
     return () => {
       if (interval) clearInterval(interval);
     };
-  }, [isPlayingInline, project, isLocked]);
+  }, [isPlayingInline, isVideoLoaded, project, isLocked]);
 
   const handleStartPlay = (e) => {
     e.stopPropagation();
     setIsLocked(false);
+    setIsVideoLoaded(false);
     setSecondsRemaining(60);
     setIsPlayingInline(true);
   };
@@ -38,6 +40,7 @@ function StaggeredProjectCard({ project, onOpenModal }) {
   const handleReplay = (e) => {
     e.stopPropagation();
     setIsLocked(false);
+    setIsVideoLoaded(false);
     setSecondsRemaining(60);
     // Refresh iframe
     setIsPlayingInline(false);
@@ -56,14 +59,14 @@ function StaggeredProjectCard({ project, onOpenModal }) {
         {isPlayingInline ? (
           <div className="relative w-full h-full bg-black">
             
-            {/* If long-form reaches 60s, unmount player and lock */}
+            {/* If long-form reaches 60s of loaded playback, unmount player and lock */}
             {isLocked && project.isLongForm ? (
               <div className="absolute inset-0 bg-[#0C0C0C] flex flex-col items-center justify-center p-6 text-center space-y-4 z-30 animate-in fade-in duration-300">
                 <span className="text-xs font-mono text-[#FF6B50] uppercase tracking-widest">
-                  // PREVIEW LIMIT REACHED (1:00)
+                  // WATCH FULL VIDEO
                 </span>
                 <p className="text-sm text-white font-medium max-w-xs leading-relaxed">
-                  You have reached the 1-minute site preview limit for "{project.title}".
+                  Watch the remaining video on Google Drive to view the complete cut of "{project.title}".
                 </p>
                 <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2 w-full max-w-xs">
                   <a
@@ -72,7 +75,7 @@ function StaggeredProjectCard({ project, onOpenModal }) {
                     rel="noopener noreferrer"
                     className="w-full py-2.5 px-4 rounded-lg bg-[#FF6B50] hover:bg-[#ff5537] text-black font-extrabold text-xs font-mono tracking-wider uppercase transition-colors flex items-center justify-center gap-1.5 shadow-lg"
                   >
-                    <span>WATCH FULL CUT ON DRIVE</span>
+                    <span>WATCH REMAINING ON DRIVE</span>
                     <ExternalLink className="w-3.5 h-3.5" />
                   </a>
                   <button
@@ -80,7 +83,7 @@ function StaggeredProjectCard({ project, onOpenModal }) {
                     className="w-full py-2.5 px-4 rounded-lg bg-[#1A1A1A] hover:bg-white hover:text-black text-xs font-mono text-[#888888] transition-colors flex items-center justify-center gap-1.5"
                   >
                     <RotateCcw className="w-3.5 h-3.5" />
-                    <span>REPLAY (1:00)</span>
+                    <span>REPLAY</span>
                   </button>
                 </div>
               </div>
@@ -90,19 +93,10 @@ function StaggeredProjectCard({ project, onOpenModal }) {
                 <iframe
                   src={`https://drive.google.com/file/d/${project.driveId}/preview`}
                   allow="autoplay; fullscreen"
+                  onLoad={() => setIsVideoLoaded(true)}
                   className="w-full h-full border-0"
                   title={project.title}
                 />
-
-                {/* Floating Countdown Badge for Long-Form Cuts */}
-                {project.isLongForm && (
-                  <div className="absolute top-3 left-3 z-20 pointer-events-none">
-                    <span className="text-[10px] font-mono text-black bg-[#FF6B50] font-bold px-2.5 py-1 rounded shadow-md flex items-center gap-1">
-                      <Clock className="w-3 h-3" />
-                      PREVIEW: {60 - secondsRemaining}s / 60s (AUTO-LOCKS AT 1:00)
-                    </span>
-                  </div>
-                )}
               </>
             )}
           </div>
@@ -128,7 +122,7 @@ function StaggeredProjectCard({ project, onOpenModal }) {
             {/* Top Badge */}
             <div className="absolute top-4 left-4 right-4 flex items-center justify-between z-20 pointer-events-none">
               <span className="text-[10px] font-mono text-white/90 bg-black/70 backdrop-blur-md px-2.5 py-1 rounded border border-white/10">
-                {project.isLongForm ? 'PREVIEW (1:00) • FULL ON DRIVE' : `${project.aspectRatio} • SHORT`}
+                {project.isLongForm ? 'FEATURED CUT' : `${project.aspectRatio} • SHORT`}
               </span>
 
               <div className="flex items-center gap-2 pointer-events-auto">
@@ -154,7 +148,7 @@ function StaggeredProjectCard({ project, onOpenModal }) {
         <div className="flex items-center justify-between text-[10px] font-bold tracking-[0.2em] uppercase text-[#666666]">
           <span>{project.categoryLabel} // {project.tools.join(" • ")}</span>
           {project.isLongForm ? (
-            <span className="text-[#FF6B50] font-mono">1 MIN SITE PREVIEW</span>
+            <span className="text-[#FF6B50] font-mono">LONG-FORM CUT</span>
           ) : (
             <span className="text-white font-mono">9:16 VERTICAL</span>
           )}
@@ -215,7 +209,7 @@ export default function StaggeredGallery({ onOpenModal }) {
             Video Portfolio.
           </h2>
           <p className="text-xs text-[#888888] max-w-lg">
-            Plays directly inline on the website. Long-form cuts feature a 1-minute site preview with direct access to the full video on Google Drive.
+            Plays directly inline on the website. High-impact video editing across documentary, commercial, and short-form content.
           </p>
         </div>
 

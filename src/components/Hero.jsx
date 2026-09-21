@@ -8,7 +8,7 @@ export default function Hero({ onCopyEmail }) {
       {/* Top minimal tag */}
       <div className="flex items-center justify-between text-xs font-mono text-[#888888] tracking-wider uppercase pt-4">
         <span>GOWTHAM // VIDEO EDITOR</span>
-        <span>OREGAIRU EDITS • AMVs • REELS</span>
+        <span>COMMERCIAL • DOCUMENTARY • SHORT-FORM</span>
       </div>
 
       {/* Massive Editorial Headline */}
@@ -17,7 +17,7 @@ export default function Hero({ onCopyEmail }) {
           /EDITS.
         </h1>
         <p className="text-xl md:text-2xl text-[#888888] tracking-tight max-w-3xl mt-2 font-normal">
-          5 years refining narrative timing, velocity sync, and cinematic pacing across <span className="text-white">After Effects</span>, <span className="text-white">Premiere Pro</span>, and <span className="text-white">CapCut PC</span>.
+          Experienced video editor refining narrative timing, velocity sync, and cinematic pacing across <span className="text-white">After Effects</span>, <span className="text-white">Premiere Pro</span>, and <span className="text-white">CapCut PC</span>.
         </p>
       </div>
 
@@ -48,7 +48,7 @@ export default function Hero({ onCopyEmail }) {
           </div>
 
           <div className="text-xs text-[#888888] space-y-0.5 font-normal">
-            <p className="text-white font-medium">5 Years Experience</p>
+            <p className="text-white font-medium">Experienced Freelance Editor</p>
             <p>After Effects • Premiere Pro • CapCut PC</p>
           </div>
         </div>

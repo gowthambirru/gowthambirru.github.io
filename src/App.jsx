@@ -88,7 +88,7 @@ export default function App() {
         {/* Staggered Work Gallery: 2-column project grid with inline video playback */}
         <StaggeredGallery onOpenModal={(proj) => setSelectedProject(proj)} />
 
-        {/* Benefits Bento Grid: 5 YEARS oversized typography */}
+        {/* Bento Grid: Experience & Discipline */}
         <BentoSkills />
 
         {/* Impact Typographic Footer: 14vw CRAFT MORE, contact stack, 56px circular buttons */}

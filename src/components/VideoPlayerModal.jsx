@@ -1,19 +1,21 @@
 import React, { useEffect, useState } from 'react';
-import { X, ChevronLeft, ChevronRight, Share2, ExternalLink, RotateCcw, Clock } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Share2, ExternalLink, RotateCcw } from 'lucide-react';
 
 export default function VideoPlayerModal({ project, allProjects, onClose, onSelectProject, onCopyNotification }) {
   const [showPreviewLimit, setShowPreviewLimit] = useState(false);
+  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
   const [secondsRemaining, setSecondsRemaining] = useState(60);
   const [isIframeMounted, setIsIframeMounted] = useState(true);
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
     setShowPreviewLimit(false);
+    setIsVideoLoaded(false);
     setSecondsRemaining(60);
     setIsIframeMounted(true);
 
     let interval;
-    if (project?.isLongForm) {
+    if (project?.isLongForm && isVideoLoaded) {
       interval = setInterval(() => {
         setSecondsRemaining((prev) => {
           if (prev <= 1) {
@@ -39,7 +41,7 @@ export default function VideoPlayerModal({ project, allProjects, onClose, onSele
       window.removeEventListener('keydown', handleKeyDown);
       if (interval) clearInterval(interval);
     };
-  }, [project]);
+  }, [project, isVideoLoaded]);
 
   if (!project) return null;
 
@@ -62,6 +64,7 @@ export default function VideoPlayerModal({ project, allProjects, onClose, onSele
 
   const handleReplay = () => {
     setShowPreviewLimit(false);
+    setIsVideoLoaded(false);
     setSecondsRemaining(60);
     setIsIframeMounted(false);
     setTimeout(() => setIsIframeMounted(true), 100);
@@ -86,7 +89,7 @@ export default function VideoPlayerModal({ project, allProjects, onClose, onSele
           <div className="flex items-center gap-3">
             <span className="w-2 h-2 rounded-full bg-[#FF6B50]" />
             <span className="text-xs font-mono text-[#888888] uppercase tracking-wider">
-              IN-PAGE THEATER // {project.isLongForm ? '1 MIN PREVIEW' : project.aspectRatio}
+              IN-PAGE THEATER // {project.categoryLabel}
             </span>
           </div>
 
@@ -121,10 +124,10 @@ export default function VideoPlayerModal({ project, allProjects, onClose, onSele
               {showPreviewLimit && project.isLongForm ? (
                 <div className="w-full h-full bg-[#0C0C0C] rounded-lg border border-[#222222] flex flex-col items-center justify-center p-6 text-center space-y-4 z-30 animate-in fade-in duration-300">
                   <span className="text-xs font-mono text-[#FF6B50] uppercase tracking-widest">
-                    // PREVIEW LIMIT REACHED (1:00)
+                    // WATCH FULL VIDEO
                   </span>
                   <p className="text-sm text-white font-medium max-w-sm leading-relaxed">
-                    You have reached the 1-minute site preview limit for "{project.title}".
+                    Watch the remaining video on Google Drive to view the complete cut of "{project.title}".
                   </p>
                   <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2 w-full max-w-sm">
                     <a
@@ -133,7 +136,7 @@ export default function VideoPlayerModal({ project, allProjects, onClose, onSele
                       rel="noopener noreferrer"
                       className="w-full py-2.5 px-4 rounded-lg bg-[#FF6B50] hover:bg-[#ff5537] text-black font-extrabold text-xs font-mono tracking-wider uppercase transition-colors flex items-center justify-center gap-1.5 shadow-lg"
                     >
-                      <span>WATCH FULL CUT ON GOOGLE DRIVE</span>
+                      <span>WATCH REMAINING ON GOOGLE DRIVE</span>
                       <ExternalLink className="w-3.5 h-3.5" />
                     </a>
                     <button
@@ -141,7 +144,7 @@ export default function VideoPlayerModal({ project, allProjects, onClose, onSele
                       className="w-full py-2.5 px-4 rounded-lg bg-[#1A1A1A] hover:bg-white hover:text-black text-xs font-mono text-[#888888] transition-colors flex items-center justify-center gap-1.5"
                     >
                       <RotateCcw className="w-3.5 h-3.5" />
-                      <span>REPLAY (1:00)</span>
+                      <span>REPLAY</span>
                     </button>
                   </div>
                 </div>
@@ -151,19 +154,10 @@ export default function VideoPlayerModal({ project, allProjects, onClose, onSele
                     key={project.id}
                     src={`https://drive.google.com/file/d/${project.driveId}/preview`}
                     allow="autoplay; fullscreen"
+                    onLoad={() => setIsVideoLoaded(true)}
                     className="w-full h-full border-0 rounded-lg shadow-2xl"
                     title={project.title}
                   />
-
-                  {/* Floating Countdown Badge for Long-Form Cuts */}
-                  {project.isLongForm && (
-                    <div className="absolute top-3 left-3 z-20 pointer-events-none">
-                      <span className="text-[10px] font-mono text-black bg-[#FF6B50] font-bold px-2.5 py-1 rounded shadow-md flex items-center gap-1">
-                        <Clock className="w-3 h-3" />
-                        PREVIEW: {60 - secondsRemaining}s / 60s (LOCKS AT 1:00)
-                      </span>
-                    </div>
-                  )}
                 </>
               ) : null}
             </div>
@@ -209,11 +203,11 @@ export default function VideoPlayerModal({ project, allProjects, onClose, onSele
               {project.isLongForm && (
                 <div className="p-4 rounded-xl bg-[#141414] border border-[#222222] space-y-2">
                   <div className="flex items-center justify-between text-xs">
-                    <span className="font-mono text-[#FF6B50] font-semibold">PREVIEW MODE</span>
-                    <span className="text-[#888888] font-mono text-[11px]">1 MIN ON SITE</span>
+                    <span className="font-mono text-[#FF6B50] font-semibold">MASTER CUT</span>
+                    <span className="text-[#888888] font-mono text-[11px]">GOOGLE DRIVE</span>
                   </div>
                   <p className="text-xs text-[#888888]">
-                    This long-form video can be previewed on the website. To watch the complete high-bitrate master cut, open it on Google Drive:
+                    To watch the complete high-bitrate master cut of this project, open it on Google Drive:
                   </p>
                   <a
                     href={project.driveUrl}

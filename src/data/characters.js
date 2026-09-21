@@ -25,7 +25,7 @@ export const CHARACTERS = [
     colorClass: "text-yui border-yui/40 bg-yui/10",
     gradientClass: "from-rose-500/20 via-pink-500/10 to-transparent",
     glowColor: "shadow-[0_0_25px_rgba(251,113,133,0.25)]",
-    badge: "EMOTIVE AMVs",
+    badge: "EMOTIVE CUTS",
     quote: "Every transition should carry emotion—connecting the music straight to the viewer's heart.",
     quoteJapanese: "「全部、ちゃんと届けたいんだ」",
     avatarSvg: "sakura",
