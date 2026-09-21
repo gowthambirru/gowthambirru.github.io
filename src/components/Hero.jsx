@@ -12,11 +12,11 @@ export default function Hero({ onCopyEmail }) {
       </div>
 
       {/* Editorial Headline */}
-      <div className="my-auto py-8 select-none">
-        <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tightest leading-tight text-[#EBEBEB] uppercase">
+      <div className="my-auto py-4 select-none">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight leading-tight text-[#EBEBEB] uppercase">
           /EDITS.
         </h1>
-        <p className="text-lg md:text-xl text-[#888888] tracking-tight max-w-2xl mt-3 font-normal">
+        <p className="text-sm sm:text-base text-[#888888] tracking-tight max-w-xl mt-2 font-normal leading-relaxed">
           Experienced video editor refining narrative timing, velocity sync, and cinematic pacing across <span className="text-white">After Effects</span>, <span className="text-white">Premiere Pro</span>, and <span className="text-white">CapCut PC</span>.
         </p>
       </div>

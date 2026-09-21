@@ -15,11 +15,11 @@ export default function ImpactFooter({
     <footer id="contact" className="pt-24 pb-32 px-6 max-w-7xl mx-auto border-t border-[#222222]">
       
       {/* Editorial Headline */}
-      <div className="select-none mb-10">
-        <p className="text-xs font-mono text-[#888888] tracking-widest uppercase mb-4">
+      <div className="select-none mb-8">
+        <p className="text-xs font-mono text-[#888888] tracking-widest uppercase mb-3">
           // INQUIRIES & COMMISSIONS
         </p>
-        <h2 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tightest leading-tight text-[#EBEBEB] uppercase">
+        <h2 className="text-3xl sm:text-4xl md:text-5xl font-black tracking-tight leading-tight text-[#EBEBEB] uppercase">
           CRAFT MORE.
         </h2>
       </div>
