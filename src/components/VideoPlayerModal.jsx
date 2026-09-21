@@ -1,19 +1,30 @@
 import React, { useEffect, useState } from 'react';
-import { X, ChevronLeft, ChevronRight, Share2, ExternalLink, RotateCcw } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight, Share2, ExternalLink, RotateCcw, Clock } from 'lucide-react';
 
 export default function VideoPlayerModal({ project, allProjects, onClose, onSelectProject, onCopyNotification }) {
   const [showPreviewLimit, setShowPreviewLimit] = useState(false);
+  const [secondsRemaining, setSecondsRemaining] = useState(60);
+  const [isIframeMounted, setIsIframeMounted] = useState(true);
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
     setShowPreviewLimit(false);
+    setSecondsRemaining(60);
+    setIsIframeMounted(true);
 
-    let timer;
+    let interval;
     if (project?.isLongForm) {
-      // 60-second preview limit for long-form cuts
-      timer = setTimeout(() => {
-        setShowPreviewLimit(true);
-      }, (project.previewTimeLimit || 60) * 1000);
+      interval = setInterval(() => {
+        setSecondsRemaining((prev) => {
+          if (prev <= 1) {
+            clearInterval(interval);
+            setShowPreviewLimit(true);
+            setIsIframeMounted(false);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
     }
     
     const handleKeyDown = (e) => {
@@ -26,7 +37,7 @@ export default function VideoPlayerModal({ project, allProjects, onClose, onSele
     return () => {
       document.body.style.overflow = 'unset';
       window.removeEventListener('keydown', handleKeyDown);
-      if (timer) clearTimeout(timer);
+      if (interval) clearInterval(interval);
     };
   }, [project]);
 
@@ -51,6 +62,9 @@ export default function VideoPlayerModal({ project, allProjects, onClose, onSele
 
   const handleReplay = () => {
     setShowPreviewLimit(false);
+    setSecondsRemaining(60);
+    setIsIframeMounted(false);
+    setTimeout(() => setIsIframeMounted(true), 100);
   };
 
   const isVertical = project.aspectRatio === '9:16';
@@ -101,44 +115,57 @@ export default function VideoPlayerModal({ project, allProjects, onClose, onSele
           {/* Video Player Column */}
           <div className={`lg:col-span-8 flex items-center justify-center p-4 sm:p-6 bg-black relative min-h-[340px] ${isVertical ? 'lg:col-span-7' : ''}`}>
             
-            <div className={`relative w-full h-full flex items-center justify-center ${isVertical ? 'max-w-sm aspect-[9/16]' : 'aspect-video'}`}>
-              <iframe
-                key={project.id}
-                src={`https://drive.google.com/file/d/${project.driveId}/preview`}
-                allow="autoplay; fullscreen"
-                className="w-full h-full border-0 rounded-lg shadow-2xl"
-                title={project.title}
-              />
-
-              {/* 1-Minute Preview Limit Overlay */}
-              {showPreviewLimit && project.isLongForm && (
-                <div className="absolute inset-0 bg-black/90 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center space-y-4 z-30 animate-in fade-in duration-300 rounded-lg">
+            <div className={`relative w-full ${isVertical ? 'max-w-[340px] aspect-[9/16]' : 'aspect-video'}`}>
+              
+              {/* 1-Minute Preview Limit Lock Screen (Iframe Unmounted) */}
+              {showPreviewLimit && project.isLongForm ? (
+                <div className="w-full h-full bg-[#0C0C0C] rounded-lg border border-[#222222] flex flex-col items-center justify-center p-6 text-center space-y-4 z-30 animate-in fade-in duration-300">
                   <span className="text-xs font-mono text-[#FF6B50] uppercase tracking-widest">
-                    PREVIEW LIMIT REACHED (1:00)
+                    // PREVIEW LIMIT REACHED (1:00)
                   </span>
                   <p className="text-sm text-white font-medium max-w-sm leading-relaxed">
-                    Continue watching the full cut of "{project.title}" on Google Drive.
+                    You have reached the 1-minute site preview limit for "{project.title}".
                   </p>
-                  <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2 w-full max-w-sm">
                     <a
                       href={project.driveUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-5 py-2.5 rounded-lg bg-[#FF6B50] hover:bg-[#ff5537] text-black font-extrabold text-xs font-mono tracking-wider uppercase transition-colors flex items-center gap-1.5 shadow-lg"
+                      className="w-full py-2.5 px-4 rounded-lg bg-[#FF6B50] hover:bg-[#ff5537] text-black font-extrabold text-xs font-mono tracking-wider uppercase transition-colors flex items-center justify-center gap-1.5 shadow-lg"
                     >
                       <span>WATCH FULL CUT ON GOOGLE DRIVE</span>
                       <ExternalLink className="w-3.5 h-3.5" />
                     </a>
                     <button
                       onClick={handleReplay}
-                      className="px-4 py-2.5 rounded-lg bg-[#1A1A1A] hover:bg-white hover:text-black text-xs font-mono text-[#888888] transition-colors flex items-center gap-1.5"
+                      className="w-full py-2.5 px-4 rounded-lg bg-[#1A1A1A] hover:bg-white hover:text-black text-xs font-mono text-[#888888] transition-colors flex items-center justify-center gap-1.5"
                     >
                       <RotateCcw className="w-3.5 h-3.5" />
-                      <span>DISMISS</span>
+                      <span>REPLAY (1:00)</span>
                     </button>
                   </div>
                 </div>
-              )}
+              ) : isIframeMounted ? (
+                <>
+                  <iframe
+                    key={project.id}
+                    src={`https://drive.google.com/file/d/${project.driveId}/preview`}
+                    allow="autoplay; fullscreen"
+                    className="w-full h-full border-0 rounded-lg shadow-2xl"
+                    title={project.title}
+                  />
+
+                  {/* Floating Countdown Badge for Long-Form Cuts */}
+                  {project.isLongForm && (
+                    <div className="absolute top-3 left-3 z-20 pointer-events-none">
+                      <span className="text-[10px] font-mono text-black bg-[#FF6B50] font-bold px-2.5 py-1 rounded shadow-md flex items-center gap-1">
+                        <Clock className="w-3 h-3" />
+                        PREVIEW: {60 - secondsRemaining}s / 60s (LOCKS AT 1:00)
+                      </span>
+                    </div>
+                  )}
+                </>
+              ) : null}
             </div>
 
             {/* Navigation buttons */}
