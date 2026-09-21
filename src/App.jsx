@@ -73,45 +73,45 @@ export default function App() {
     <div className="min-h-screen relative text-[#EBEBEB] selection:bg-[#FF6B50] selection:text-white bg-[#050505]">
       
       {/* Visibly Crisp & Responsive Fixed Background for Mobile & Desktop */}
-      <div className="fixed inset-0 -z-10 pointer-events-none overflow-hidden">
-        <img 
-          src={`${import.meta.env.BASE_URL}images/oregairu_bg.jpg`}
-          alt="Portfolio Background"
-          className="w-full h-full object-cover object-[center_top] md:object-center opacity-45 sm:opacity-35 scale-105 transition-opacity duration-700"
-        />
-        {/* Subtle cinematic gradient overlay preserving artwork visibility */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#050505]/50 via-[#050505]/70 to-[#050505]/95" />
-      </div>
+      <div 
+        className="fixed inset-0 pointer-events-none z-0 bg-cover bg-[center_top] md:bg-center transition-all duration-500"
+        style={{
+          backgroundImage: `linear-gradient(to bottom, rgba(5, 5, 5, 0.55) 0%, rgba(5, 5, 5, 0.70) 35%, rgba(5, 5, 5, 0.92) 100%), url('${import.meta.env.BASE_URL}images/oregairu_bg.jpg')`
+        }}
+      />
 
-      {/* Fixed Top Navigation */}
-      <Navbar onCopyDiscord={handleCopyDiscord} />
+      {/* Main Content Layer (z-10 ensures full interactivity & visibility on top of background) */}
+      <div className="relative z-10">
+        {/* Fixed Top Navigation */}
+        <Navbar onCopyDiscord={handleCopyDiscord} />
 
-      {/* Main Single-Page Editorial Content */}
-      <main>
-        {/* Hero: 13vw /EDITS typography, social proof character stack, email link */}
-        <Hero onCopyEmail={handleCopyEmail} />
+        {/* Main Single-Page Editorial Content */}
+        <main>
+          {/* Hero: /EDITS typography, social proof character stack, email link */}
+          <Hero onCopyEmail={handleCopyEmail} />
 
-        {/* Staggered Work Gallery: 2-column project grid with inline video playback */}
-        <StaggeredGallery onOpenModal={(proj) => setSelectedProject(proj)} />
+          {/* Staggered Work Gallery: 2-column project grid with inline video playback */}
+          <StaggeredGallery onOpenModal={(proj) => setSelectedProject(proj)} />
 
-        {/* Bento Grid: Experience & Discipline */}
-        <BentoSkills />
+          {/* Bento Grid: Experience & Discipline */}
+          <BentoSkills />
 
-        {/* Impact Typographic Footer: 14vw CRAFT MORE, contact stack, 56px circular buttons */}
-        <ImpactFooter
+          {/* Impact Typographic Footer: CRAFT MORE, contact stack, 56px circular buttons */}
+          <ImpactFooter
+            onCopyDiscord={handleCopyDiscord}
+            onCopyEmail={handleCopyEmail}
+            discordCopied={discordCopied}
+            emailCopied={emailCopied}
+          />
+        </main>
+
+        {/* Floating Glassmorphic Bottom Dock */}
+        <Dock
           onCopyDiscord={handleCopyDiscord}
           onCopyEmail={handleCopyEmail}
-          discordCopied={discordCopied}
-          emailCopied={emailCopied}
+          onScrollToWork={handleScrollToWork}
         />
-      </main>
-
-      {/* Floating Glassmorphic Bottom Dock */}
-      <Dock
-        onCopyDiscord={handleCopyDiscord}
-        onCopyEmail={handleCopyEmail}
-        onScrollToWork={handleScrollToWork}
-      />
+      </div>
 
       {/* Cinematic In-Page Video Player Modal */}
       {selectedProject && (
