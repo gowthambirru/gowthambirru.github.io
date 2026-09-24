@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import confetti from 'canvas-confetti';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { MotionConfig } from 'motion/react';
 import Navbar from './components/Navbar';
 import Dock from './components/Dock';
 import Hero from './components/Hero';
@@ -7,129 +7,47 @@ import BentoSkills from './components/BentoSkills';
 import StaggeredGallery from './components/StaggeredGallery';
 import ImpactFooter from './components/ImpactFooter';
 import VideoPlayerModal from './components/VideoPlayerModal';
-import Toast from './components/Toast';
+import SceneBackdrop from './components/SceneBackdrop';
+import { MediaSuspendedContext } from './components/PreviewMedia';
 import { PROJECTS } from './data/projects';
 
 export default function App() {
   const [selectedProject, setSelectedProject] = useState(null);
+  const [origin, setOrigin] = useState(null);
   const [toast, setToast] = useState(null);
-  const [discordCopied, setDiscordCopied] = useState(false);
-  const [emailCopied, setEmailCopied] = useState(false);
+  const [copied, setCopied] = useState(null);
+  const toastTimer = useRef(0);
+  const openProject = useCallback((project, element) => { setOrigin(element); setSelectedProject(project); }, []);
+  const closeProject = useCallback(() => setSelectedProject(null), []);
 
-  // Trigger toast with auto dismiss
-  const showToast = (title, message) => {
-    setToast({ title, message });
-    setTimeout(() => {
-      setToast((prev) => (prev?.title === title ? null : prev));
-    }, 3500);
-  };
-
-  // Sparkle confetti effect
-  const fireConfetti = () => {
+  useEffect(() => () => clearTimeout(toastTimer.current), []);
+  const copy = async (value, kind) => {
+    clearTimeout(toastTimer.current);
     try {
-      confetti({
-        particleCount: 35,
-        spread: 50,
-        origin: { y: 0.85 },
-        colors: ['#FF6B50', '#EBEBEB', '#888888']
-      });
-    } catch (e) {
-      // safe fallback
+      await navigator.clipboard.writeText(value);
+      setCopied(kind);
+      setToast(`${kind === 'email' ? 'Email' : 'Discord username'} copied. Talk soon!`);
+    } catch {
+      setCopied(null);
+      setToast(`Couldn't copy. You can select it here: ${value}`);
     }
+    toastTimer.current = setTimeout(() => { setToast(null); setCopied(null); }, 4000);
   };
 
-  // Copy Discord handler
-  const handleCopyDiscord = () => {
-    const username = "gowtham.xd";
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(username);
-    }
-    setDiscordCopied(true);
-    fireConfetti();
-    showToast("Discord Username Copied", "Added 'gowtham.xd' to clipboard.");
-    setTimeout(() => setDiscordCopied(false), 3000);
-  };
-
-  // Copy Email handler
-  const handleCopyEmail = () => {
-    const email = "gowthamcrontech@gmail.com";
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(email);
-    }
-    setEmailCopied(true);
-    fireConfetti();
-    showToast("Email Address Copied", "Added 'gowthamcrontech@gmail.com' to clipboard.");
-    setTimeout(() => setEmailCopied(false), 3000);
-  };
-
-  const handleScrollToWork = () => {
-    const workSection = document.getElementById('work');
-    if (workSection) {
-      workSection.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
-
-  return (
-    <div className="min-h-screen relative text-[#EBEBEB] selection:bg-[#FF6B50] selection:text-white bg-[#050505]">
-      
-      {/* Visibly Crisp & Responsive Fixed Background for Mobile & Desktop */}
-      <div 
-        className="fixed inset-0 pointer-events-none z-0 bg-cover bg-[center_top] md:bg-center transition-all duration-500"
-        style={{
-          backgroundImage: `linear-gradient(to bottom, rgba(5, 5, 5, 0.55) 0%, rgba(5, 5, 5, 0.70) 35%, rgba(5, 5, 5, 0.92) 100%), url('${import.meta.env.BASE_URL}images/oregairu_bg.jpg')`
-        }}
-      />
-
-      {/* Main Content Layer (z-10 ensures full interactivity & visibility on top of background) */}
-      <div className="relative z-10">
-        {/* Fixed Top Navigation */}
-        <Navbar onCopyDiscord={handleCopyDiscord} />
-
-        {/* Main Single-Page Editorial Content */}
-        <main>
-          {/* Hero: /EDITS typography, social proof character stack, email link */}
-          <Hero onCopyEmail={handleCopyEmail} />
-
-          {/* Staggered Work Gallery: 2-column project grid with inline video playback */}
-          <StaggeredGallery onOpenModal={(proj) => setSelectedProject(proj)} />
-
-          {/* Bento Grid: Experience & Discipline */}
-          <BentoSkills />
-
-          {/* Impact Typographic Footer: CRAFT MORE, contact stack, 56px circular buttons */}
-          <ImpactFooter
-            onCopyDiscord={handleCopyDiscord}
-            onCopyEmail={handleCopyEmail}
-            discordCopied={discordCopied}
-            emailCopied={emailCopied}
-          />
-        </main>
-
-        {/* Floating Glassmorphic Bottom Dock */}
-        <Dock
-          onCopyDiscord={handleCopyDiscord}
-          onCopyEmail={handleCopyEmail}
-          onScrollToWork={handleScrollToWork}
-        />
-      </div>
-
-      {/* Cinematic In-Page Video Player Modal */}
-      {selectedProject && (
-        <VideoPlayerModal
-          project={selectedProject}
-          allProjects={PROJECTS}
-          onClose={() => setSelectedProject(null)}
-          onSelectProject={(proj) => setSelectedProject(proj)}
-          onCopyNotification={showToast}
-        />
-      )}
-
-      {/* Minimal Feedback Toast */}
-      <Toast
-        toast={toast}
-        onClose={() => setToast(null)}
-      />
-
+  return <MotionConfig reducedMotion="user"><MediaSuspendedContext.Provider value={!!selectedProject}>
+    <div className="site-root">
+      <a href="#work" className="skip-link">Skip to the work</a>
+      <SceneBackdrop />
+      <Navbar suspended={!!selectedProject} />
+      <main>
+        <Hero onOpenModal={openProject} />
+        <StaggeredGallery onOpenModal={openProject} />
+        <BentoSkills />
+        <ImpactFooter onCopyDiscord={() => copy('gowtham.xd', 'discord')} onCopyEmail={() => copy('gowthamcrontech@gmail.com', 'email')} discordCopied={copied === 'discord'} emailCopied={copied === 'email'} />
+      </main>
+      <Dock />
+      {selectedProject && <VideoPlayerModal project={selectedProject} allProjects={PROJECTS} origin={origin} onClose={closeProject} onSelectProject={setSelectedProject} />}
+      <div className={`toast-message ${toast ? 'is-visible' : ''}`} role="status" aria-live="polite">{toast}</div>
     </div>
-  );
+  </MediaSuspendedContext.Provider></MotionConfig>;
 }

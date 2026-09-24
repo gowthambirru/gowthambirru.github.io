@@ -1,282 +1,159 @@
-import React, { useEffect, useState } from 'react';
-import { X, ChevronLeft, ChevronRight, Share2, ExternalLink, RotateCcw } from 'lucide-react';
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import gsap from 'gsap';
+import { ArrowLeft, ArrowRight, ArrowUpRight, X } from '@phosphor-icons/react';
+import { useReducedMotion } from '../hooks/useReducedMotion';
 
-export default function VideoPlayerModal({ project, allProjects, onClose, onSelectProject, onCopyNotification }) {
-  const [showPreviewLimit, setShowPreviewLimit] = useState(false);
-  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
-  const [secondsRemaining, setSecondsRemaining] = useState(60);
-  const [isIframeMounted, setIsIframeMounted] = useState(true);
+function VideoSession({ project, onMediaRef }) {
+  const ref = useRef(null);
+  const timer = useRef(0);
+  const [status, setStatus] = useState('loading');
+  const [retry, setRetry] = useState(0);
+  const clearWaiting = () => clearTimeout(timer.current);
+  const waiting = () => {
+    clearWaiting();
+    setStatus('loading');
+    timer.current = setTimeout(() => {
+      ref.current?.pause();
+      setStatus('error');
+    }, 12000);
+  };
 
   useEffect(() => {
-    document.body.style.overflow = 'hidden';
-    setShowPreviewLimit(false);
-    setIsVideoLoaded(false);
-    setSecondsRemaining(60);
-    setIsIframeMounted(true);
-
-    let interval;
-    if (project?.isLongForm && isVideoLoaded) {
-      interval = setInterval(() => {
-        setSecondsRemaining((prev) => {
-          if (prev <= 1) {
-            clearInterval(interval);
-            setShowPreviewLimit(true);
-            setIsIframeMounted(false);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    }
-    
-    const handleKeyDown = (e) => {
-      if (e.key === 'Escape') onClose();
-      if (e.key === 'ArrowRight') handleNext();
-      if (e.key === 'ArrowLeft') handlePrev();
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
+    const video = ref.current;
+    let current = true;
+    onMediaRef(video);
+    waiting();
+    video.load();
+    video.play().catch(error => {
+      if (!current || error.name === 'AbortError') return;
+      if (error.name === 'NotAllowedError') { clearWaiting(); setStatus('ready'); }
+      else { clearWaiting(); setStatus('error'); }
+    });
     return () => {
-      document.body.style.overflow = 'unset';
-      window.removeEventListener('keydown', handleKeyDown);
-      if (interval) clearInterval(interval);
+      current = false;
+      clearWaiting();
+      video.pause();
+      onMediaRef(null);
     };
-  }, [project, isVideoLoaded]);
+  }, [project.videoUrl, retry, onMediaRef]);
 
-  if (!project) return null;
+  return <div className={`player-media ${project.aspectRatio === '9:16' ? 'is-portrait' : ''}`} data-player-frame>
+    <video ref={ref} src={project.videoUrl} poster={project.thumbnail} controls playsInline preload="metadata"
+      aria-label={project.title} data-testid="project-video" tabIndex={0}
+      onPlaying={() => { clearWaiting(); setStatus('playing'); }}
+      onCanPlay={() => { clearWaiting(); setStatus(ref.current?.paused ? 'ready' : 'playing'); }}
+      onPause={() => setStatus(previous => previous === 'error' ? previous : 'paused')}
+      onEnded={() => setStatus('ended')}
+      onWaiting={waiting} onSeeking={waiting}
+      onSeeked={() => { clearWaiting(); setStatus(ref.current?.paused ? 'paused' : 'playing'); }}
+      onError={() => { clearWaiting(); setStatus('error'); }} />
+    {status === 'loading' && <div className="player-loading" role="status"><span className="loading-mark" /> LOADING YOUR CUT</div>}
+    {status === 'error' && <div className="player-error" role="alert">
+      <span className="eyebrow">LET'S TRY THAT AGAIN</span><p>This cut couldn't load.</p>
+      <button type="button" className="action-button primary" onClick={() => setRetry(value => value + 1)}>RETRY VIDEO</button>
+      <a href={project.driveUrl} target="_blank" rel="noreferrer">Watch on Google Drive <ArrowUpRight size={16} /></a>
+    </div>}
+    <span className="sr-only" role="status">{status === 'playing' ? 'Video playing' : status === 'paused' ? 'Video paused' : status === 'ended' ? 'Video ended' : ''}</span>
+  </div>;
+}
 
-  const currentIndex = allProjects.findIndex(p => p.id === project.id);
-  const handlePrev = () => {
-    const prevIndex = (currentIndex - 1 + allProjects.length) % allProjects.length;
-    onSelectProject(allProjects[prevIndex]);
-  };
-  const handleNext = () => {
-    const nextIndex = (currentIndex + 1) % allProjects.length;
-    onSelectProject(allProjects[nextIndex]);
-  };
+export default function VideoPlayerModal({ project, allProjects, origin, onClose, onSelectProject }) {
+  const dialogRef = useRef(null);
+  const panelRef = useRef(null);
+  const ghostRef = useRef(null);
+  const mediaRef = useRef(null);
+  const closing = useRef(false);
+  const initialOrigin = useRef(origin);
+  const opener = useRef(document.activeElement);
+  const reduced = useReducedMotion();
+  const [direction, setDirection] = useState(1);
+  const index = allProjects.findIndex(item => item.id === project.id);
+  const setMediaRef = useCallback(video => { mediaRef.current = video; }, []);
 
-  const handleShare = () => {
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(window.location.href);
-      onCopyNotification("Project Link Copied", `Copied link to ${project.title}`);
+  const close = useCallback(() => {
+    if (closing.current) return;
+    closing.current = true;
+    mediaRef.current?.pause();
+    const panel = panelRef.current;
+    const ghost = ghostRef.current;
+    let source = initialOrigin.current;
+    if (source?.dataset.projectOrigin?.endsWith(project.id) !== true) source = document.querySelector(`[data-project-origin="work-${project.id}"]`);
+    const end = source?.getBoundingClientRect();
+    const start = panel.querySelector('[data-player-frame]')?.getBoundingClientRect();
+    const visible = end && end.bottom > 80 && end.top < window.innerHeight - 60 && end.width > 0;
+    gsap.killTweensOf([panel, ghost]);
+    if (reduced) { onClose(); return; }
+    gsap.to(panel, { opacity: 0, duration: 0.18 });
+    if (visible && start) {
+      ghost.src = project.thumbnail;
+      gsap.set(ghost, { display: 'block', opacity: 1, left: start.left, top: start.top, width: start.width, height: start.height });
+      gsap.to(ghost, { left: end.left, top: end.top, width: end.width, height: end.height, duration: 0.42, ease: 'power3.inOut', onComplete: onClose });
+    } else gsap.to(panel, { opacity: 0, duration: 0.2, onComplete: onClose });
+  }, [onClose, project.id, project.thumbnail, reduced]);
+
+  useLayoutEffect(() => {
+    const dialog = dialogRef.current;
+    const panel = panelRef.current;
+    const ghost = ghostRef.current;
+    const previousOverflow = document.body.style.overflow;
+    const previousPadding = document.body.style.paddingRight;
+    const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+    document.body.style.overflow = 'hidden';
+    document.body.style.paddingRight = `${scrollbarWidth}px`;
+    dialog.showModal();
+    dialog.querySelector('[aria-label="Close project"]')?.focus({ preventScroll: true });
+    const source = initialOrigin.current?.getBoundingClientRect();
+    const target = panel.querySelector('[data-player-frame]')?.getBoundingClientRect();
+    const timeline = gsap.timeline();
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches && source && target) {
+      gsap.set(panel, { opacity: 0 });
+      gsap.set(ghost, { display: 'block', opacity: 1, left: source.left, top: source.top, width: source.width, height: source.height });
+      timeline.to(ghost, { left: target.left, top: target.top, width: target.width, height: target.height, duration: 0.48, ease: 'power3.inOut' })
+        .to(panel, { opacity: 1, duration: 0.16 }, '-=0.1').set(ghost, { display: 'none' });
     }
+    return () => {
+      timeline.kill();
+      gsap.killTweensOf([panel, ghost]);
+      dialog.close();
+      document.body.style.overflow = previousOverflow;
+      document.body.style.paddingRight = previousPadding;
+      if (opener.current?.isConnected) opener.current.focus({ preventScroll: true });
+    };
+  }, []);
+
+  const select = delta => {
+    if (closing.current) return;
+    mediaRef.current?.pause();
+    setDirection(delta);
+    onSelectProject(allProjects[(index + delta + allProjects.length) % allProjects.length]);
   };
 
-  const handleReplay = () => {
-    setShowPreviewLimit(false);
-    setIsVideoLoaded(false);
-    setSecondsRemaining(60);
-    setIsIframeMounted(false);
-    setTimeout(() => setIsIframeMounted(true), 100);
+  const containFocus = event => {
+    if (event.key !== 'Tab') return;
+    const controls = [...dialogRef.current.querySelectorAll('button, a[href], video[controls], input')].filter(element => element.getClientRects().length && !element.disabled);
+    const first = controls[0];
+    const last = controls[controls.length - 1];
+    if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+    else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
   };
 
-  const isVertical = project.aspectRatio === '9:16';
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 lg:p-10 bg-black/90 backdrop-blur-md">
-      
-      {/* Click outside to close */}
-      <div className="absolute inset-0" onClick={onClose} />
-
-      {/* Modal Container */}
-      <div 
-        className="relative w-full max-w-6xl max-h-[92vh] bg-[#0C0C0C] rounded-2xl overflow-hidden shadow-2xl border border-[#222222] flex flex-col z-10"
-        onClick={(e) => e.stopPropagation()}
-      >
-        
-        {/* Modal Top Header Bar */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-[#222222] bg-[#050505]">
-          <div className="flex items-center gap-3">
-            <span className="w-2 h-2 rounded-full bg-[#FF6B50]" />
-            <span className="text-xs font-mono text-[#888888] uppercase tracking-wider">
-              IN-PAGE THEATER // {project.categoryLabel}
-            </span>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <button
-              onClick={handleShare}
-              className="p-1.5 rounded-lg border border-[#222222] bg-[#111111] hover:bg-white hover:text-black text-[#888888] transition-colors duration-300 text-xs flex items-center gap-1 font-mono"
-              title="Copy link"
-            >
-              <Share2 className="w-3.5 h-3.5" />
-              <span className="hidden md:inline">SHARE</span>
-            </button>
-            <button
-              onClick={onClose}
-              className="p-1.5 rounded-lg border border-[#222222] bg-[#111111] hover:bg-[#FF6B50] hover:text-black text-[#888888] transition-colors duration-300"
-              title="Close modal (Esc)"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
+  return <dialog ref={dialogRef} className="player-dialog" aria-labelledby="project-title" onKeyDown={containFocus} onCancel={e => { e.preventDefault(); close(); }}
+    onClick={e => { if (e.target === e.currentTarget) close(); }}>
+    <img ref={ghostRef} src={project.thumbnail} className="transition-frame" alt="" aria-hidden="true" />
+    <div ref={panelRef} className={`player-panel ${project.aspectRatio === '9:16' ? 'portrait-panel' : ''}`}>
+      <header className="player-header"><span><i className="status-dot" /> NOW VIEWING / {String(index + 1).padStart(2, '0')} OF {String(allProjects.length).padStart(2, '0')}</span>
+        <button type="button" onClick={close} aria-label="Close project">CLOSE <span className="dim">ESC</span><X size={20} /></button></header>
+      <div className="player-body" key={project.id} style={{ '--entry-x': `${reduced ? 0 : direction * 18}px` }}>
+        <VideoSession project={project} onMediaRef={setMediaRef} />
+        <div className="player-details">
+          <span className="eyebrow">{project.categoryLabel} / {project.isLongForm ? '90 SECOND PREVIEW' : project.duration}</span>
+          <h2 id="project-title">{project.title}</h2><p>{project.description}</p>
+          <span className="project-tools">{project.tools.join(' + ')}</span>
+          <a className="text-action" href={project.driveUrl} target="_blank" rel="noreferrer">{project.isLongForm ? 'WATCH THE FULL EDIT' : 'OPEN ON GOOGLE DRIVE'}<ArrowUpRight size={18} /></a>
         </div>
-
-        {/* Modal Main Area: Video Player + Details Sidebar */}
-        <div className="flex-1 overflow-y-auto grid grid-cols-1 lg:grid-cols-12 bg-black">
-          
-          {/* Video Player Column */}
-          <div className={`lg:col-span-8 flex items-center justify-center p-4 sm:p-6 bg-black relative min-h-[340px] ${isVertical ? 'lg:col-span-7' : ''}`}>
-            
-            <div className={`relative w-full ${isVertical ? 'max-w-[340px] aspect-[9/16]' : 'aspect-video'}`}>
-              
-              {/* 1-Minute Preview Limit Lock Screen (Iframe Unmounted) */}
-              {showPreviewLimit && project.isLongForm ? (
-                <div className="w-full h-full bg-[#0C0C0C] rounded-lg border border-[#222222] flex flex-col items-center justify-center p-6 text-center space-y-4 z-30 animate-in fade-in duration-300">
-                  <span className="text-xs font-mono text-[#FF6B50] uppercase tracking-widest">
-                    // WATCH FULL VIDEO
-                  </span>
-                  <p className="text-sm text-white font-medium max-w-sm leading-relaxed">
-                    Watch the remaining video on Google Drive to view the complete cut of "{project.title}".
-                  </p>
-                  <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2 w-full max-w-sm">
-                    <a
-                      href={project.driveUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="w-full py-2.5 px-4 rounded-lg bg-[#FF6B50] hover:bg-[#ff5537] text-black font-extrabold text-xs font-mono tracking-wider uppercase transition-colors flex items-center justify-center gap-1.5 shadow-lg"
-                    >
-                      <span>WATCH REMAINING ON GOOGLE DRIVE</span>
-                      <ExternalLink className="w-3.5 h-3.5" />
-                    </a>
-                    <button
-                      onClick={handleReplay}
-                      className="w-full py-2.5 px-4 rounded-lg bg-[#1A1A1A] hover:bg-white hover:text-black text-xs font-mono text-[#888888] transition-colors flex items-center justify-center gap-1.5"
-                    >
-                      <RotateCcw className="w-3.5 h-3.5" />
-                      <span>REPLAY</span>
-                    </button>
-                  </div>
-                </div>
-              ) : isIframeMounted ? (
-                <>
-                  <iframe
-                    key={project.id}
-                    src={`https://drive.google.com/file/d/${project.driveId}/preview`}
-                    allow="autoplay; fullscreen"
-                    onLoad={() => setIsVideoLoaded(true)}
-                    className="w-full h-full border-0 rounded-lg shadow-2xl"
-                    title={project.title}
-                  />
-                </>
-              ) : null}
-            </div>
-
-            {/* Navigation buttons */}
-            <button
-              onClick={handlePrev}
-              className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-[#111111]/80 hover:bg-white hover:text-black border border-[#333333] text-white flex items-center justify-center transition-all duration-300 shadow-lg z-20"
-              title="Previous"
-            >
-              <ChevronLeft className="w-5 h-5" />
-            </button>
-
-            <button
-              onClick={handleNext}
-              className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-[#111111]/80 hover:bg-white hover:text-black border border-[#333333] text-white flex items-center justify-center transition-all duration-300 shadow-lg z-20"
-              title="Next"
-            >
-              <ChevronRight className="w-5 h-5" />
-            </button>
-
-          </div>
-
-          {/* Details Sidebar */}
-          <div className={`lg:col-span-4 p-6 sm:p-8 flex flex-col justify-between bg-[#0C0C0C] border-t lg:border-t-0 lg:border-l border-[#222222] space-y-6 ${isVertical ? 'lg:col-span-5' : ''}`}>
-            
-            <div className="space-y-4">
-              
-              <div className="flex items-center justify-between text-xs font-mono text-[#888888] uppercase tracking-wider">
-                <span>{project.categoryLabel}</span>
-                <span>{project.duration}</span>
-              </div>
-
-              <h2 className="text-2xl sm:text-3xl font-bold text-[#EBEBEB] tracking-tightest leading-tight">
-                {project.title}
-              </h2>
-
-              <p className="text-sm text-[#888888] leading-relaxed">
-                {project.description}
-              </p>
-
-              {/* Long-form Google Drive CTA Button */}
-              {project.isLongForm && (
-                <div className="p-4 rounded-xl bg-[#141414] border border-[#222222] space-y-2">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="font-mono text-[#FF6B50] font-semibold">MASTER CUT</span>
-                    <span className="text-[#888888] font-mono text-[11px]">GOOGLE DRIVE</span>
-                  </div>
-                  <p className="text-xs text-[#888888]">
-                    To watch the complete high-bitrate master cut of this project, open it on Google Drive:
-                  </p>
-                  <a
-                    href={project.driveUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="w-full py-2.5 px-4 rounded-lg bg-[#FF6B50] hover:bg-[#ff5537] text-black font-extrabold text-xs font-mono tracking-wider uppercase transition-colors flex items-center justify-center gap-1.5 shadow-md"
-                  >
-                    <span>OPEN FULL CUT ON DRIVE</span>
-                    <ExternalLink className="w-3.5 h-3.5" />
-                  </a>
-                </div>
-              )}
-
-              {/* Tools & Techniques */}
-              <div className="pt-4 border-t border-[#222222] space-y-3">
-                <div>
-                  <span className="text-xs font-mono text-[#666666] uppercase tracking-wider">Software:</span>
-                  <p className="text-sm text-[#EBEBEB] font-medium mt-0.5">
-                    {project.tools.join(" • ")}
-                  </p>
-                </div>
-
-                <div>
-                  <span className="text-xs font-mono text-[#666666] uppercase tracking-wider">Techniques:</span>
-                  <p className="text-xs text-[#888888] font-mono mt-0.5">
-                    {project.techniques.join(" / ")}
-                  </p>
-                </div>
-              </div>
-
-            </div>
-
-            {/* Bottom Navigation */}
-            <div className="pt-6 border-t border-[#222222] space-y-3">
-              <div className="flex items-center justify-between text-xs font-mono text-[#666666]">
-                <span>PROJECT {currentIndex + 1} OF {allProjects.length}</span>
-                <a 
-                  href={project.driveUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[#FF6B50] hover:underline flex items-center gap-1"
-                >
-                  <span>Drive Link</span>
-                  <ExternalLink className="w-3 h-3" />
-                </a>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <button
-                  onClick={handlePrev}
-                  className="py-2.5 px-4 rounded-lg bg-[#141414] hover:bg-white hover:text-black text-xs text-[#888888] border border-[#222222] font-mono transition-colors duration-300"
-                >
-                  PREVIOUS
-                </button>
-                <button
-                  onClick={handleNext}
-                  className="py-2.5 px-4 rounded-lg bg-[#FF6B50] hover:bg-[#ff5537] text-xs text-black font-extrabold font-mono transition-colors duration-300"
-                >
-                  NEXT VIDEO
-                </button>
-              </div>
-            </div>
-
-          </div>
-
-        </div>
-
       </div>
-
+      <footer className="player-footer"><button type="button" onClick={() => select(-1)}><ArrowLeft size={18} /> PREVIOUS CUT</button>
+        <span>SOUNDTRACK PAUSED WHILE YOU WATCH</span><button type="button" onClick={() => select(1)}>NEXT CUT <ArrowRight size={18} /></button></footer>
     </div>
-  );
+  </dialog>;
 }

@@ -9,24 +9,31 @@ export default {
     extend: {
       colors: {
         background: '#050505',
+        accent: {
+          DEFAULT: '#38BDF8',
+          hover: '#0EA5E9',
+          light: '#BAE6FD',
+        },
         coral: {
-          DEFAULT: '#FF6B50',
-          hover: '#ff5537',
+          DEFAULT: '#38BDF8',
+          hover: '#0EA5E9',
         },
         surface: {
-          card: '#111111',
-          hover: '#1A1A1A',
-          border: '#333333',
+          card: '#0D0D0D',
+          hover: '#161616',
+          border: '#262626',
         },
         editorial: {
-          text: '#EBEBEB',
-          muted: '#888888',
-          subtle: '#666666',
+          text: '#F8FAFC',
+          muted: '#CBD5E1',
+          subtle: '#94A3B8',
         }
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
-        japanese: ['"Zen Kaku Gothic New"', 'sans-serif'],
+        display: ['"Jersey 10"', 'sans-serif'],
+        jersey: ['"Jersey 10"', 'sans-serif'],
+        sans: ['"Geom"', 'system-ui', '-apple-system', 'sans-serif'],
+        geom: ['"Geom"', 'sans-serif'],
         mono: ['"JetBrains Mono"', 'monospace'],
       },
       letterSpacing: {

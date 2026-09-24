@@ -1,73 +1,31 @@
-import React from 'react';
-import { Home, Film, MessageSquare, Mail, Sparkles } from 'lucide-react';
+import React, { useEffect, useState } from 'react';
 
-export default function Dock({ onCopyDiscord, onCopyEmail, onScrollToWork }) {
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  return (
-    <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-40">
-      <div className="editorial-dock px-3 py-2 flex items-center shadow-2xl">
-        
-        {/* Home */}
-        <button
-          onClick={scrollToTop}
-          className="p-3 text-[#888888] hover:text-white hover:bg-[#222222] rounded-lg transition-all duration-300"
-          title="Top"
-        >
-          <Home className="w-4 h-4" />
-        </button>
-
-        {/* Separator */}
-        <div className="h-6 w-[1px] bg-[#333333] mx-1" />
-
-        {/* Work / Videos */}
-        <button
-          onClick={onScrollToWork}
-          className="p-3 text-[#888888] hover:text-white hover:bg-[#222222] rounded-lg transition-all duration-300"
-          title="Watch Videos"
-        >
-          <Film className="w-4 h-4" />
-        </button>
-
-        {/* Separator */}
-        <div className="h-6 w-[1px] bg-[#333333] mx-1" />
-
-        {/* Copy Discord */}
-        <button
-          onClick={onCopyDiscord}
-          className="p-3 text-[#888888] hover:text-white hover:bg-[#222222] rounded-lg transition-all duration-300 flex items-center gap-2"
-          title="Copy Discord: gowtham.xd"
-        >
-          <MessageSquare className="w-4 h-4" />
-          <span className="hidden sm:inline text-xs font-mono font-medium">gowtham.xd</span>
-        </button>
-
-        {/* Separator */}
-        <div className="h-6 w-[1px] bg-[#333333] mx-1" />
-
-        {/* Copy Email */}
-        <button
-          onClick={onCopyEmail}
-          className="p-3 text-[#888888] hover:text-white hover:bg-[#222222] rounded-lg transition-all duration-300"
-          title="Copy Email: gowthamcrontech@gmail.com"
-        >
-          <Mail className="w-4 h-4" />
-        </button>
-
-        {/* Separator */}
-        <div className="h-6 w-[1px] bg-[#333333] mx-1" />
-
-        {/* Primary CTA button in #FF6B50 with black bold text (uppercase, tracking-wide) */}
-        <a
-          href="#contact"
-          className="ml-1 px-5 py-2.5 rounded-lg bg-[#FF6B50] hover:bg-[#ff5537] text-black font-extrabold text-xs tracking-wider uppercase transition-all duration-300 flex items-center gap-1.5 shadow-lg active:scale-95"
-        >
-          <span>COMMISSION</span>
-        </a>
-
-      </div>
-    </div>
-  );
+const SECTIONS = [{ id: 'hero', name: 'INTRO', number: '00' }, { id: 'work', name: 'WORK', number: '01' }, { id: 'skills', name: 'SKILLS', number: '02' }, { id: 'contact', name: 'CONTACT', number: '03' }];
+export default function Dock() {
+  const [position, setPosition] = useState({ progress: 0, active: 'hero' });
+  useEffect(() => {
+    let frame = 0;
+    const measure = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        const max = document.documentElement.scrollHeight - window.innerHeight;
+        const progress = max > 0 ? Math.min(100, Math.max(0, window.scrollY / max * 100)) : 0;
+        const active = SECTIONS.reduce((current, section) => document.getElementById(section.id)?.getBoundingClientRect().top <= window.innerHeight * 0.45 ? section.id : current, 'hero');
+        setPosition({ progress, active });
+      });
+    };
+    const observer = new ResizeObserver(measure);
+    observer.observe(document.body);
+    window.addEventListener('scroll', measure, { passive: true });
+    window.addEventListener('resize', measure);
+    measure();
+    return () => { cancelAnimationFrame(frame); observer.disconnect(); window.removeEventListener('scroll', measure); window.removeEventListener('resize', measure); };
+  }, []);
+  return <nav className="sequence-dock" aria-label="Page sequence">
+    <span className="dock-label">SEQUENCE / 01</span>
+    <div className="dock-sections">{SECTIONS.map(section => <a key={section.id} href={`#${section.id}`} aria-current={position.active === section.id ? 'location' : undefined}><span>{section.number}</span>{section.name}</a>)}</div>
+    <span className="dock-percent">{String(Math.round(position.progress)).padStart(2, '0')}%</span>
+    <input type="range" className="page-scrubber" min="0" max="100" step="0.1" value={position.progress} aria-label="Page progress" aria-valuetext={`${Math.round(position.progress)} percent`}
+      style={{ '--progress': `${position.progress}%` }} onChange={e => window.scrollTo({ top: Number(e.target.value) / 100 * (document.documentElement.scrollHeight - window.innerHeight), behavior: 'instant' })} />
+  </nav>;
 }

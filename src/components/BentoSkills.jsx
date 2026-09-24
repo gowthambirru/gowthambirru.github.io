@@ -1,80 +1,38 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { AnimatePresence, motion } from 'motion/react';
+import { ArrowUpRight, Plus } from '@phosphor-icons/react';
+import Reveal from './Reveal';
+import { useReducedMotion } from '../hooks/useReducedMotion';
+import { sequenceTransition } from '../animation/sequence';
+
+const CRAFT = [
+  { title: 'Pacing & story', text: 'Cut the dead air. Keep the good bits. Give every moment enough room to land.', bars: [28, 48, 35, 76, 42, 65, 88, 44, 60, 32, 72, 45] },
+  { title: 'Shorts & podcast clips', text: 'Find the moment worth sharing, then shape it into a short that makes sense on its own.', bars: [25, 30, 80, 85, 80, 30, 25, 90, 85, 80, 30, 20] },
+  { title: 'Sound & beat sync', text: 'Cuts that hit the beat. Sound effects that support the action. Voices you can hear clearly.', bars: [20, 50, 85, 50, 20, 65, 95, 65, 20, 50, 85, 50] },
+  { title: 'Motion, text & graphics', text: 'Clean captions, punch-in zooms, animated titles, and graphics that help tell the story.', bars: [20, 28, 36, 44, 52, 60, 68, 76, 84, 76, 60, 40] },
+];
 
 export default function BentoSkills() {
-  return (
-    <section id="experience" className="py-24 px-6 max-w-7xl mx-auto">
-      
-      {/* Full-Width Editorial Experience Card */}
-      <div className="bg-[#111111] rounded-[2.5rem] p-8 md:p-14 border border-[#222222] space-y-12">
-        
-        {/* Top Header */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-8 border-b border-[#222222]">
-          <div className="space-y-4 max-w-2xl">
-            <span className="text-xs font-mono text-[#888888] tracking-widest uppercase">
-              // DISCIPLINE & TOOLING
-            </span>
-
-            <div className="space-y-1">
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tight text-[#EBEBEB] leading-tight">
-                EXPERIENCED.
-              </h2>
-              <p className="text-sm sm:text-base text-[#888888] tracking-tight font-medium">
-                Frame-accurate video editing.
-              </p>
-            </div>
-
-            <p className="text-sm text-[#888888] leading-relaxed">
-              Devoted to the craft of video editing. Balancing aggressive velocity curves with cinematic narrative breathing room.
-            </p>
-          </div>
-
-          <div className="text-xs font-mono text-[#888888] text-left md:text-right space-y-1">
-            <p className="text-white font-bold">FREELANCE STATUS</p>
-            <p>COMMISSIONS OPEN</p>
-            <p className="text-[#FF6B50]">WORLDWIDE REMOTE</p>
-          </div>
+  const [open, setOpen] = useState(0);
+  const reduced = useReducedMotion();
+  return <section id="skills" className="skills-section section-shell">
+    <Reveal className="section-heading"><div><span className="eyebrow section-index">02 / BEHIND THE EDIT</span><h2>SMALL DETAILS.<br /><span>BIG DIFFERENCE.</span></h2></div></Reveal>
+    <div className="skills-layout">
+      <Reveal className="tools-column"><p>The tools matter.<br />Knowing when to cut matters more.</p>
+        <div className="tool-list">
+          {[['Cc', 'CapCut PC', 'Shorts, Reels & quick cuts'], ['Pr', 'Premiere Pro', 'Podcasts & long-form'], ['Ae', 'After Effects', 'Motion, titles & overlays']].map(([mark, name, description]) => <div className="tool-row" key={name}><span className="tool-mark">{mark}</span><div><h3>{name}</h3><span>{description}</span></div></div>)}
         </div>
-
-        {/* 3-Column Editorial Grid for the Core Tools */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          
-          <div className="space-y-3 p-6 rounded-2xl bg-[#0C0C0C] border border-[#1E1E1E]">
-            <span className="text-xs font-mono text-[#FF6B50]">01 // MOTION & VFX</span>
-            <h3 className="text-lg font-bold text-[#EBEBEB] tracking-tight">
-              Adobe After Effects
-            </h3>
-            <p className="text-xs font-mono text-[#888888]">Advanced VFX & Motion</p>
-            <p className="text-xs text-[#888888] leading-relaxed pt-2 border-t border-[#1A1A1A]">
-              3D camera tracking, velocity curve remapping, kinetic typography, rotoscoping, and custom VFX.
-            </p>
-          </div>
-
-          <div className="space-y-3 p-6 rounded-2xl bg-[#0C0C0C] border border-[#1E1E1E]">
-            <span className="text-xs font-mono text-[#FF6B50]">02 // STORY & PACING</span>
-            <h3 className="text-lg font-bold text-[#EBEBEB] tracking-tight">
-              Adobe Premiere Pro
-            </h3>
-            <p className="text-xs font-mono text-[#888888]">Narrative & Long-Form NLE</p>
-            <p className="text-xs text-[#888888] leading-relaxed pt-2 border-t border-[#1A1A1A]">
-              Multi-cam narrative flow, multi-track foley & dialogue EQ, J/L-cut transitions, and Lumetri color grading.
-            </p>
-          </div>
-
-          <div className="space-y-3 p-6 rounded-2xl bg-[#0C0C0C] border border-[#1E1E1E]">
-            <span className="text-xs font-mono text-[#FF6B50]">03 // SHORT-FORM VIRAL</span>
-            <h3 className="text-lg font-bold text-[#EBEBEB] tracking-tight">
-              CapCut PC
-            </h3>
-            <p className="text-xs font-mono text-[#888888]">High-Retention Short-Form</p>
-            <p className="text-xs text-[#888888] leading-relaxed pt-2 border-t border-[#1A1A1A]">
-              High-retention 9:16 vertical reels, 3-second visual hooks, dynamic animated captions, and rapid turnaround.
-            </p>
-          </div>
-
-        </div>
-
+        <span className="experience-note"><strong>MULTIPLE YEARS</strong> OF MAKING THE CUT</span>
+      </Reveal>
+      <div className="craft-list">
+        {CRAFT.map((item, index) => <div key={item.title} className={`craft-item ${open === index ? 'is-open' : ''}`}>
+          <h3><button type="button" id={`craft-trigger-${index}`} aria-expanded={open === index} aria-controls={`craft-panel-${index}`} onClick={() => setOpen(open === index ? null : index)}><span className="craft-index">0{index + 1}</span>{item.title}<Plus size={22} /></button></h3>
+          <AnimatePresence initial={false}>{open === index && <motion.div id={`craft-panel-${index}`} role="region" aria-labelledby={`craft-trigger-${index}`}
+            initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={reduced ? { duration: 0 } : sequenceTransition} className="craft-panel">
+            <div className="craft-content"><div className="edit-waveform" aria-hidden="true">{item.bars.map((height, i) => <i key={i} style={{ height: `${height}%` }} />)}</div><p>{item.text}</p><a href="#work" className="text-action">SEE IT IN THE WORK <ArrowUpRight size={16} /></a></div>
+          </motion.div>}</AnimatePresence>
+        </div>)}
       </div>
-
-    </section>
-  );
+    </div>
+  </section>;
 }

@@ -1,0 +1,87 @@
+{
+  "videos": [
+    {
+      "id": "juices",
+      "source": "https://github.com/gowthambirru/gowthambirru.github.io/releases/download/v-media/juices_preview_fast.mp4",
+      "original_bytes": 47640553,
+      "path": "videos/juices.mp4",
+      "bytes": 6902247,
+      "duration": 90.033333,
+      "width": 1280,
+      "height": 720,
+      "codec": "h264",
+      "pixel_format": "yuv420p",
+      "sha256": "99b13313acec43e9fe25048e520204a9bf65021116c5a64f4916e91f09f6e8a0",
+      "preview": "videos/juices-loop.mp4",
+      "preview_bytes": 62855
+    },
+    {
+      "id": "crime",
+      "source": "https://github.com/gowthambirru/gowthambirru.github.io/releases/download/v-media/crime_doc_preview.mp4",
+      "original_bytes": 108460770,
+      "path": "videos/crime.mp4",
+      "bytes": 14713395,
+      "duration": 90.033333,
+      "width": 1280,
+      "height": 714,
+      "codec": "h264",
+      "pixel_format": "yuv420p",
+      "sha256": "e313c05f270390295e34eb7a6d411f55398ce727fdd427b228876b212463be61",
+      "preview": "videos/crime-loop.mp4",
+      "preview_bytes": 298393
+    },
+    {
+      "id": "trading",
+      "source": "https://github.com/gowthambirru/gowthambirru.github.io/releases/download/v-media/trading_preview.mp4",
+      "original_bytes": 159301072,
+      "path": "videos/trading.mp4",
+      "bytes": 13950917,
+      "duration": 90.066667,
+      "width": 1280,
+      "height": 720,
+      "codec": "h264",
+      "pixel_format": "yuv420p",
+      "sha256": "7c05b2eb4cc06f2772efc74dab3f0b0c37fe4cc302bf61edcb380a4442b93dfa",
+      "preview": "videos/trading-loop.mp4",
+      "preview_bytes": 324112
+    },
+    {
+      "id": "pawn",
+      "source": "https://github.com/gowthambirru/gowthambirru.github.io/releases/download/v-media/pawn_stars_fast.mp4",
+      "original_bytes": 59234917,
+      "path": "videos/pawn.mp4",
+      "bytes": 5090134,
+      "duration": 52.566667,
+      "width": 406,
+      "height": 720,
+      "codec": "h264",
+      "pixel_format": "yuv420p",
+      "sha256": "003bf9987372804b936df932b390a8b0df5bf935181580bd55d4761d5798ddcf",
+      "preview": "videos/pawn-loop.mp4",
+      "preview_bytes": 289711
+    },
+    {
+      "id": "basketball",
+      "source": "https://github.com/gowthambirru/gowthambirru.github.io/releases/download/v-media/basketballv2F.mp4",
+      "original_bytes": 44523214,
+      "path": "videos/basketball.mp4",
+      "bytes": 3544263,
+      "duration": 23.7,
+      "width": 406,
+      "height": 720,
+      "codec": "h264",
+      "pixel_format": "yuv420p",
+      "sha256": "4030f48324eb683038bbda3a594a3b2764eca942fae59a1dcb939ae6db6e47f1",
+      "preview": "videos/basketball-loop.mp4",
+      "preview_bytes": 397384
+    }
+  ],
+  "audio": {
+    "source": "https://www.youtube.com/watch?v=y_HdvkRYMfE",
+    "title": "Oregairu OP KARAOKE | Yukitoki - Yanagi Nagi (Instrumental/Lyrics)",
+    "path": "audio/yukitoki-instrumental.m4a",
+    "bytes": 1603782,
+    "duration": 100.972,
+    "processing": "AAC 128 kbps; 1.2s fade in and 2s fade out; full duration preserved"
+  }
+}
