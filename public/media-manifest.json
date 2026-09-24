@@ -80,8 +80,8 @@
     "source": "https://www.youtube.com/watch?v=y_HdvkRYMfE",
     "title": "Oregairu OP KARAOKE | Yukitoki - Yanagi Nagi (Instrumental/Lyrics)",
     "path": "audio/yukitoki-instrumental.m4a",
-    "bytes": 1603782,
-    "duration": 100.972,
-    "processing": "AAC 128 kbps; 1.2s fade in and 2s fade out; full duration preserved"
+    "bytes": 1595180,
+    "duration": 96.84,
+    "processing": "Trimmed 4.15s dead silence from start; dynamic audio normalization (-19 LUFS, TP -2.5 dB); ambient lowpass 8kHz, highpass 70Hz"
   }
 }

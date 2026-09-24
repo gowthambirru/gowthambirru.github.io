@@ -51,14 +51,13 @@ with concurrent.futures.ThreadPoolExecutor(max_workers=2) as pool:
 manifest = {'videos': records}
 audio_source = STAGING / 'yukitoki.webm'
 if audio_source.exists():
-    duration = float(probe(audio_source)['format']['duration'])
     audio_output = ROOT / 'public' / 'audio' / 'yukitoki-instrumental.m4a'
-    subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', str(audio_source), '-vn',
-        '-af', f'afade=t=in:d=1.2,afade=t=out:st={duration-2}:d=2',
-        '-c:a', 'aac', '-b:a', '128k', '-movflags', '+faststart', str(audio_output)], check=True)
+    af = 'highpass=f=70,lowpass=f=8000,dynaudnorm=f=150:g=15:p=0.85:m=5.0,loudnorm=I=-19:TP=-2.5:LRA=7,afade=t=in:ss=0:d=0.15,afade=t=out:st=94.0:d=2.5'
+    subprocess.run(['ffmpeg', '-v', 'error', '-y', '-ss', '4.15', '-i', str(audio_source), '-vn',
+        '-af', af, '-c:a', 'aac', '-b:a', '128k', '-movflags', '+faststart', str(audio_output)], check=True)
     manifest['audio'] = dict(source='https://www.youtube.com/watch?v=y_HdvkRYMfE',
         title='Oregairu OP KARAOKE | Yukitoki - Yanagi Nagi (Instrumental/Lyrics)',
         path='audio/yukitoki-instrumental.m4a', bytes=audio_output.stat().st_size,
         duration=float(probe(audio_output)['format']['duration']),
-        processing='AAC 128 kbps; 1.2s fade in and 2s fade out; full duration preserved')
+        processing='Trimmed 4.15s dead silence from start; dynamic audio normalization (-19 LUFS, TP -2.5 dB); ambient lowpass 8kHz, highpass 70Hz')
 (ROOT / 'public' / 'media-manifest.json').write_text(json.dumps(manifest, indent=2)+'\n')
