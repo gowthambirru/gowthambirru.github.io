@@ -26,7 +26,7 @@ export const CHARACTERS = [
     gradientClass: "from-rose-500/20 via-pink-500/10 to-transparent",
     glowColor: "shadow-[0_0_25px_rgba(251,113,133,0.25)]",
     badge: "EMOTIVE CUTS",
-    quote: "Every transition should carry emotion—connecting the music straight to the viewer's heart.",
+    quote: "Every transition should carry emotion, connecting the music straight to the viewer's heart.",
     quoteJapanese: "「全部、ちゃんと届けたいんだ」",
     avatarSvg: "sakura",
     editingStyle: "Gentle film halation, layered ambient foley, harmonic audio-visual flow."

@@ -2,10 +2,12 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 
 const TRACK = `${import.meta.env.BASE_URL}audio/yukitoki-instrumental.m4a`;
 const LEVEL = 0.18;
+const UNLOCK_EVENTS = ['pointerdown', 'pointerup', 'touchstart', 'mousedown', 'keydown', 'click'];
 
 export default function AmbientAudio({ suspended }) {
   const audioRef = useRef(null);
   const userWantsAudio = useRef(true);
+  const unlocked = useRef(false);
   const suspendedRef = useRef(suspended);
   const fadeFrame = useRef(0);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -28,45 +30,55 @@ export default function AmbientAudio({ suspended }) {
     fadeFrame.current = setInterval(step, 16);
   }, []);
 
-  // Try autoplay on mount; if blocked by browser policy, listen for first user gesture anywhere
+  const removeUnlockListeners = useCallback((fn) => {
+    UNLOCK_EVENTS.forEach(evt => {
+      document.removeEventListener(evt, fn, true);
+      window.removeEventListener(evt, fn, true);
+    });
+  }, []);
+
+  // Try autoplay on mount; if blocked, keep retrying on every user gesture until it works
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
 
-    let unlockEvents = ['pointerdown', 'touchstart', 'mousedown', 'keydown', 'click'];
-    const unlock = () => {
-      unlockEvents.forEach(evt => {
-        document.removeEventListener(evt, unlock, true);
-        window.removeEventListener(evt, unlock, true);
+    const tryPlay = () => {
+      if (!userWantsAudio.current || suspendedRef.current || document.hidden || !audioRef.current) return;
+      audioRef.current.volume = 0;
+      audioRef.current.play().then(() => {
+        // Play succeeded — stop listening for gestures
+        unlocked.current = true;
+        removeUnlockListeners(unlock);
+        fade(LEVEL);
+      }).catch(() => {
+        // Play failed — keep listeners alive, try again on next gesture
       });
-      if (userWantsAudio.current && !suspendedRef.current && !document.hidden && audioRef.current) {
-        audioRef.current.volume = 0;
-        audioRef.current.play().then(() => {
-          fade(LEVEL);
-        }).catch(() => {});
-      }
     };
 
+    const unlock = () => {
+      // Don't remove listeners here — only remove after play() actually succeeds
+      tryPlay();
+    };
+
+    // Attempt autoplay immediately
     audio.volume = 0;
     audio.play().then(() => {
+      unlocked.current = true;
       fade(LEVEL);
     }).catch(() => {
-      // Browser blocked unprompted autoplay: attach unlock listeners
-      unlockEvents.forEach(evt => {
+      // Browser blocked autoplay — listen for ANY user gesture
+      UNLOCK_EVENTS.forEach(evt => {
         document.addEventListener(evt, unlock, { capture: true, passive: true });
         window.addEventListener(evt, unlock, { capture: true, passive: true });
       });
     });
 
     return () => {
-      unlockEvents.forEach(evt => {
-        document.removeEventListener(evt, unlock, true);
-        window.removeEventListener(evt, unlock, true);
-      });
+      removeUnlockListeners(unlock);
       clearInterval(fadeFrame.current);
       if (audioRef.current) audioRef.current.pause();
     };
-  }, [fade]);
+  }, [fade, removeUnlockListeners]);
 
   // Handle suspended prop (video modals)
   useEffect(() => {
@@ -102,11 +114,9 @@ export default function AmbientAudio({ suspended }) {
     if (!audio) return;
 
     if (!audio.paused) {
-      // Currently playing -> pause on this click
       userWantsAudio.current = false;
       fade(0, () => audio.pause());
     } else {
-      // Currently paused/stopped -> play immediately on this click!
       userWantsAudio.current = true;
       audio.volume = 0;
       audio.play().then(() => {
